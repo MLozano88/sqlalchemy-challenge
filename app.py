@@ -36,24 +36,42 @@ app = Flask(__name__)
 def home():
     return (
         f"Available Routes:<br/>"
-        f"/api/v1.0/precipitation"
-        f"/api/v1.0/stations"
-        f"/api/v1.0/tobs"
-        f"/api/v1.0/<start>"
-        f"/api/v1.0/<start>/<end>"
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/<start><br/>"
+        f"/api/v1.0/<start>/<end><br/>"
     )
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    return (
-      
-    )
+      # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    #Design a query to retrieve the last 12 months of precipitation data
+    results = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= "2016-08-23", Measurement.date <= "2017-08-23").\
+    order_by(Measurement.date).all()
+
+    #close session
+    session.close()
+
+
+    return jsonify(results)
+
 
 @app.route("/api/v1.0/stations")
 def stations():
-    return (
-       
-    )
+     # Create our session (link) from Python to the DB
+    session = Session(engine)
+    
+    #Design a query to find the most active stations
+    results = session.query(Measurement.station, func.count(Measurement.id)).group_by(Measurement.station).\
+    order_by(func.count(Measurement.id).desc()).all()
+
+    #close session
+    session.close()
+    
+    return jsonify(results)
 
 @app.route("/api/v1.0/tobs")
 def tobs():
