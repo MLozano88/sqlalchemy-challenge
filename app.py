@@ -75,9 +75,17 @@ def stations():
 
 @app.route("/api/v1.0/tobs")
 def tobs():
-    return (
+     # Create our session (link) from Python to the DB
+    session = Session(engine)
 
-    )
+    results = session.query(Measurement.date, Measurement.tobs).\
+    filter(Measurement.station == 'USC00519281', Measurement.date >= "2016-08-23", Measurement.date <= "2017-08-23").\
+    all()
+    
+    #close session
+    session.close()
+
+    return jsonify(results)
 
 
 if __name__ == "__main__":
